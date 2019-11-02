@@ -4,18 +4,19 @@ from pathlib import Path
 #from PyQt5.QtWidgets import (QPushButton, QLineEdit, QInputDialog, QApplication, QWidget)
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui, QtWidgets
+import openpyxl
 
 print(os.getlogin())
 home = str(Path.home())
+first_char = len(home)
 dir_list = os.listdir(home)
 print(home)
 print(dir_list)
-
 #cur_dir = home
 
 directory_list = []
 directory_list.append(home)
-#print(directory_list)
+print(directory_list)
 
 # for root, dirs, files in os.walk(".", topdown=False):
 #     print(root)
@@ -92,25 +93,30 @@ class Window(QWidget):
             #print(item)
             if os.path.isfile(item):
                 icon = QtGui.QIcon('hard-drive-disk-icon.png')
-                filename = item.strip(home)
-                #print(filename)
-                name = QListWidgetItem(icon, filename)
+                # filename = item.strip(home)
+                # print(filename)
+                # name = QListWidgetItem(icon, filename)
+                name = QListWidgetItem(icon, item[first_char+1:])
                 # name = QListWidgetItem(icon, item)
                 self.listwidget.addItem(name)
                 #print(item + " is a file")
             elif os.path.isdir(item):
                 icon = QtGui.QIcon('folder-icon.png')
-                filename = item.strip(home)
-                #print(filename)
-                name = QListWidgetItem(icon, filename)
+                # filename = item.strip(home)
+                # print(filename)
+                # name = QListWidgetItem(icon, filename)
+                name = QListWidgetItem(icon, item[first_char + 1:])
+                # name = QListWidgetItem(icon, item)
                 #name = QListWidgetItem(icon, item)
                 self.listwidget.addItem(name)
                 #print(item + " is a dir")
             else:
                 icon = QtGui.QIcon('hard-drive-disk-icon.png')
-                filename = item.strip(home)
-                #print(filename)
-                name = QListWidgetItem(icon, item)
+                # filename = item.strip(home)
+                # print(filename)
+                # name = QListWidgetItem(icon, filename)
+                name = QListWidgetItem(icon, item[first_char + 1:])
+                # name = QListWidgetItem(icon, item)
                 self.listwidget.addItem(name)
                 #print("Unknown!")
 
@@ -134,29 +140,27 @@ class Window(QWidget):
 
 
     def btn_ok_result(self, file):
-        print(file.text())
+        #print(file.text())
         self.cur_dir = self.cur_dir + "\\" + file.text()
         #cur_dir = new_dir
         print(self.cur_dir)
-        # dir_list = os.listdir(cur_dir)
+        first_char = len(self.cur_dir)
+        # dir_list = os.listdir(self.cur_dir)
         # print(dir_list)
         self.listwidget.clear()
         for item in os.listdir(self.cur_dir):
             item = os.path.join(self.cur_dir, item)
             if os.path.isfile(item):
                 icon = QtGui.QIcon('hard-drive-disk-icon.png')
-                filename = item.strip(self.cur_dir)
-                name = QListWidgetItem(icon, filename)
+                name = QListWidgetItem(icon, item[first_char + 1:])
                 self.listwidget.addItem(name)
             elif os.path.isdir(item):
                 icon = QtGui.QIcon('folder-icon.png')
-                filename = item.strip(self.cur_dir)
-                name = QListWidgetItem(icon, filename)
+                name = QListWidgetItem(icon, item[first_char + 1:])
                 self.listwidget.addItem(name)
             else:
                 icon = QtGui.QIcon('hard-drive-disk-icon.png')
-                filename = item.strip(self.cur_dir)
-                name = QListWidgetItem(icon, filename)
+                name = QListWidgetItem(icon, item[first_char + 1:])
                 self.listwidget.addItem(name)
 
 
