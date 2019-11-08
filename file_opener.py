@@ -88,5 +88,3 @@ def open_file(filename, target):
         wb.save(filename)
 
     os.startfile(filename)
-
-open_file(r'C:\Users\chris\PycharmProjects\Testing.xlsx', 'Hello')
