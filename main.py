@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui, QtWidgets
 import openpyxl
 
+import file_opener
+
 print(os.getlogin())
 home = str(Path.home())
 first_char = len(home)
@@ -140,14 +142,52 @@ class Window(QWidget):
 
 
     def btn_ok_result(self, file):
-        #print(file.text())
+        # if file.text()[-4:] is 'xlsx':
+        #     print(self.cur_dir[-4:])
+        #     file_opener.open_file(r'C:\Users\chris\PycharmProjects\Testing.xlsx', 'Hello')
+        #     return
+
+        if file.text()[-4:] == 'xlsx':
+            path = self.cur_dir + "\\" + file.text()
+            file_opener.open_file(r'{}'.format(path), 'Hello')
+            return
+        elif file.text()[-4:] == 'docx':
+            path = self.cur_dir + "\\" + file.text()
+            file_opener.open_file(r'{}'.format(path), 'edge')
+            return
+        elif file.text()[-4:] == 'pptx':
+            path = self.cur_dir + "\\" + file.text()
+            file_opener.open_file(r'{}'.format(path), 'Hello')
+            return
+
+        print(file.text())
         self.cur_dir = self.cur_dir + "\\" + file.text()
-        #cur_dir = new_dir
         print(self.cur_dir)
         first_char = len(self.cur_dir)
-        # dir_list = os.listdir(self.cur_dir)
-        # print(dir_list)
+
+
+        # if self.cur_dir[-4:] == 'xlsx':
+        #     print(self.cur_dir[-4:])
+        #     #file_opener.open_file(r'C:\Users\chris\PycharmProjects\Testing.xlsx', 'Hello')
+        #     file_opener.open_file(r'{}'.format(self.cur_dir), 'Hello')
+        #     return
+        # elif self.cur_dir[-4:] == 'docx':
+        #     file_opener.open_file(r'{}'.format(self.cur_dir), 'Hello')
+        #     return
+        # elif self.cur_dir[-4:] == 'pptx':
+        #     file_opener.open_file(r'{}'.format(self.cur_dir), 'Hello')
+        #     return
+
         self.listwidget.clear()
+
+        #file_opener.open_file(r'C:\Users\chris\PycharmProjects\Testing.xlsx', 'Hello')
+        # if file.text() is 'Testing.xlsx':
+        #     file_opener.open_file(r'C:\Users\chris\PycharmProjects\Testing.xlsx', 'Hello')
+        #     #file_opener.open_file(r'{}'.format(self.cur_dir), 'Hello')
+
+
+
+
         for item in os.listdir(self.cur_dir):
             item = os.path.join(self.cur_dir, item)
             if os.path.isfile(item):
