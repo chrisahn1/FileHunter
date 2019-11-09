@@ -7,6 +7,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import openpyxl
 
 import file_opener
+import search
 
 print(os.getlogin())
 home = str(Path.home())
@@ -19,6 +20,9 @@ print(dir_list)
 directory_list = []
 directory_list.append(home)
 print(directory_list)
+
+list_of_search_results = []
+
 
 # for root, dirs, files in os.walk(".", topdown=False):
 #     print(root)
@@ -58,10 +62,14 @@ class Window(QWidget):
         self.cur_dir = home
         self.search_button = QPushButton('Search')
         self.ok_button = QPushButton('Ok')
+
+        self.clicked_search = False
         #self.ok_button.setCheckable(True)
         #self.ok_button.toggle()
         #self.ok_button.clicked.connect(lambda: self.whichbtn(self.ok_button))
-        self.ok_button.clicked.connect(self.btn_ok)
+
+        #self.ok_button.clicked.connect(self.btn_ok)
+        self.search_button.clicked.connect(self.search_btn_clicked)
 
         # self.exit_button = QPushButton('Exit')
         # self.exit_button.setCheckable(True)
@@ -136,8 +144,37 @@ class Window(QWidget):
         self.setGeometry(300, 200, 1100, 700)
         self.show()
 
-    def btn_ok(self):
-        print('Hello World')
+    def search_btn_clicked(self, text_input):
+        self.clicked_search = True
+        sender = self.sender()
+        words = self.searchEdit.text()
+
+        #search1 = search.FileHunter()
+
+        list_of_search_results = search.test1(words)
+
+        #print(list_of_search_results)
+        for search_list in list_of_search_results:
+            print(search_list)
+
+        self.listwidget.clear()
+
+        for item in list_of_search_results:
+            #item = os.path.join(self.cur_dir, item)
+            if os.path.isfile(item):
+                icon = QtGui.QIcon('hard-drive-disk-icon.png')
+                name = QListWidgetItem(icon, item)
+                self.listwidget.addItem(name)
+            elif os.path.isdir(item):
+                icon = QtGui.QIcon('folder-icon.png')
+                name = QListWidgetItem(icon, item)
+                self.listwidget.addItem(name)
+            else:
+                icon = QtGui.QIcon('hard-drive-disk-icon.png')
+                name = QListWidgetItem(icon, item)
+                self.listwidget.addItem(name)
+
+
 
 
 
@@ -146,6 +183,20 @@ class Window(QWidget):
         #     print(self.cur_dir[-4:])
         #     file_opener.open_file(r'C:\Users\chris\PycharmProjects\Testing.xlsx', 'Hello')
         #     return
+
+        print(file.text())
+        print(self.clicked_search)
+
+        if self.clicked_search:
+            if file.text()[-4:] == 'xlsx':
+                file_opener.open_file(r'{}'.format(file.text()), 'Hello')
+                return
+            elif file.text()[-4:] == 'docx':
+                file_opener.open_file(r'{}'.format(file.text()), 'edge')
+                return
+            elif file.text()[-4:] == 'pptx':
+                file_opener.open_file(r'{}'.format(file.text()), 'Hello')
+                return
 
         if file.text()[-4:] == 'xlsx':
             path = self.cur_dir + "\\" + file.text()
@@ -184,9 +235,6 @@ class Window(QWidget):
         # if file.text() is 'Testing.xlsx':
         #     file_opener.open_file(r'C:\Users\chris\PycharmProjects\Testing.xlsx', 'Hello')
         #     #file_opener.open_file(r'{}'.format(self.cur_dir), 'Hello')
-
-
-
 
         for item in os.listdir(self.cur_dir):
             item = os.path.join(self.cur_dir, item)
