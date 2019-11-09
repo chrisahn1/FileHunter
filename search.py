@@ -3,7 +3,7 @@ from datetime import datetime
 from os import walk
 
 import pickle
-
+import main
 
 class FileHunter:
     def __init__(self):
@@ -58,22 +58,22 @@ class FileHunter:
             for row in self.results:
                 f.write(row + '\n')
 
-def test1():
+def test1(words):
     t1 = datetime.now()
     s = FileHunter()
     s.create_new_index('C:/')
-    s.search('.txt')
+    #s.search('.txt')
+    s.search(words)
 
     print()
     print(">> There were {:,d} matches out of {:,d} records searched.".format(s.matches, s.records))
     print()
     print(">> This query produced the following matches: \n")
-    for match in s.results:
-        print(match)
+    # for match in s.results:
+    #     print(match)
 
     t2 = datetime.now()
 
     print(t2-t1)
 
-
-test1()
+    return s.results
