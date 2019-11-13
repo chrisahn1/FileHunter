@@ -7,7 +7,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import openpyxl
 
 import file_opener
-import search
+import finder_7_1_w
 
 print(os.getlogin())
 home = str(Path.home())
@@ -60,6 +60,7 @@ class Window(QWidget):
 
     def UI(self):
         self.cur_dir = home
+        self.cur_word = None
         self.search_button = QPushButton('Search')
         self.ok_button = QPushButton('Ok')
 
@@ -148,10 +149,12 @@ class Window(QWidget):
         self.clicked_search = True
         sender = self.sender()
         words = self.searchEdit.text()
+        self.cur_word = words
 
         #search1 = search.FileHunter()
 
-        list_of_search_results = search.test1(words)
+        #list_of_search_results = search.test1(words)
+        list_of_search_results = finder_7_1_w.finder_result(words)
 
         #print(list_of_search_results)
         for search_list in list_of_search_results:
@@ -179,36 +182,31 @@ class Window(QWidget):
 
 
     def btn_ok_result(self, file):
-        # if file.text()[-4:] is 'xlsx':
-        #     print(self.cur_dir[-4:])
-        #     file_opener.open_file(r'C:\Users\chris\PycharmProjects\Testing.xlsx', 'Hello')
-        #     return
-
         print(file.text())
         print(self.clicked_search)
 
-        if self.clicked_search:
+        if self.clicked_search and self.cur_word:
             if file.text()[-4:] == 'xlsx':
-                file_opener.open_file(r'{}'.format(file.text()), 'Hello')
+                file_opener.open_file(r'{}'.format(file.text()), self.cur_word)
                 return
             elif file.text()[-4:] == 'docx':
-                file_opener.open_file(r'{}'.format(file.text()), 'edge')
+                file_opener.open_file(r'{}'.format(file.text()), self.cur_word)
                 return
             elif file.text()[-4:] == 'pptx':
-                file_opener.open_file(r'{}'.format(file.text()), 'Hello')
+                file_opener.open_file(r'{}'.format(file.text()), self.cur_word)
                 return
 
         if file.text()[-4:] == 'xlsx':
             path = self.cur_dir + "\\" + file.text()
-            file_opener.open_file(r'{}'.format(path), 'Hello')
+            file_opener.open_file(r'{}'.format(path), self.cur_word)
             return
         elif file.text()[-4:] == 'docx':
             path = self.cur_dir + "\\" + file.text()
-            file_opener.open_file(r'{}'.format(path), 'edge')
+            file_opener.open_file(r'{}'.format(path), self.cur_word)
             return
         elif file.text()[-4:] == 'pptx':
             path = self.cur_dir + "\\" + file.text()
-            file_opener.open_file(r'{}'.format(path), 'Hello')
+            file_opener.open_file(r'{}'.format(path), self.cur_word)
             return
 
         print(file.text())
