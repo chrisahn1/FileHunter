@@ -109,7 +109,6 @@ class Window(QWidget):
 
         for item in list_of_search_results:
             item = os.path.join(self.cur_dir, item)
-            print(item)
             if os.path.isfile(item):
                 icon = QtGui.QIcon('hard-drive-disk-icon.png')
                 name = QListWidgetItem(icon, item)
@@ -129,12 +128,12 @@ class Window(QWidget):
 
 
     def btn_ok_result(self, file):
-        print(file.text())
-        print(self.clicked_search)
+        # print(file.text())
+        # print(self.clicked_search)
 
         if self.clicked_search is not False:
-            print(self.clicked_search)
-            print(self.cur_word)
+            # print(self.clicked_search)
+            # print(self.cur_word)
             if file.text()[-4:] == 'xlsx':
                 file_opener.open_file(r'{}'.format(file.text()), self.cur_word)
                 return
@@ -145,36 +144,23 @@ class Window(QWidget):
                 file_opener.open_file(r'{}'.format(file.text()), self.cur_word)
                 return
 
-        if file.text()[-4:] == 'xlsx':
-            path = self.cur_dir + "\\" + file.text()
-            file_opener.open_file(r'{}'.format(path), 'Hello')
-            return
-        elif file.text()[-4:] == 'docx':
-            path = self.cur_dir + "\\" + file.text()
-            file_opener.open_file(r'{}'.format(path), 'Hello')
-            return
-        elif file.text()[-4:] == 'pptx':
-            path = self.cur_dir + "\\" + file.text()
-            file_opener.open_file(r'{}'.format(path), 'Hello')
-            return
+        # if file.text()[-4:] == 'xlsx':
+        #     path = self.cur_dir + "\\" + file.text()
+        #     file_opener.open_file(r'{}'.format(path), 'Hello')
+        #     return
+        # elif file.text()[-4:] == 'docx':
+        #     path = self.cur_dir + "\\" + file.text()
+        #     file_opener.open_file(r'{}'.format(path), 'Hello')
+        #     return
+        # elif file.text()[-4:] == 'pptx':
+        #     path = self.cur_dir + "\\" + file.text()
+        #     file_opener.open_file(r'{}'.format(path), 'Hello')
+        #     return
 
         # print(file.text())
         # self.cur_dir = self.cur_dir + "\\" + file.text()
         # print(self.cur_dir)
         # first_char = len(self.cur_dir)
-
-
-        # if self.cur_dir[-4:] == 'xlsx':
-        #     print(self.cur_dir[-4:])
-        #     #file_opener.open_file(r'C:\Users\chris\PycharmProjects\Testing.xlsx', 'Hello')
-        #     file_opener.open_file(r'{}'.format(self.cur_dir), 'Hello')
-        #     return
-        # elif self.cur_dir[-4:] == 'docx':
-        #     file_opener.open_file(r'{}'.format(self.cur_dir), 'Hello')
-        #     return
-        # elif self.cur_dir[-4:] == 'pptx':
-        #     file_opener.open_file(r'{}'.format(self.cur_dir), 'Hello')
-        #     return
 
         #self.listwidget.clear()
 
