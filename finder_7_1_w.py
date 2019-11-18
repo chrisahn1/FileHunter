@@ -1,5 +1,6 @@
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell
+import glob
 import xlrd
 import tika
 import time
@@ -13,6 +14,7 @@ import docx # pip install python-docx
 import PyQt5 # pip install pyqt5
 from os import walk
 import mmap
+from tika import parser
 from threading import  Thread, Lock
 from datetime import datetime
 import textract
@@ -37,7 +39,7 @@ MatchList = [] #the list of files where a match to the keyword is found. This is
 #                     ".pdf"]
 
 def getExtensionList():
-    extension_List = [".txt", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".csv", ".xlsx"]
+    extension_List = [ ".ppt", ".pptx", ".txt", ".doc", ".docx", "xls", "xlsx"]
     return extension_List
 
 def getConstraintsList ():
@@ -70,7 +72,7 @@ def getDrivesFolders(drivesList):
         try:
             driveContent = os.listdir(drive)
             for item in driveContent:
-                pathedItem = drive +'\\'+item
+                pathedItem = drive +'/'+item
                 drivesFolders.append(pathedItem)
         except:
             continue
@@ -158,6 +160,8 @@ def creat():
         print(processList)
     finally:
         mutex.release()
+    domainSet1 = refineList()
+    makePickleFile(domainSet1)
 
 
 def searchInPDF(filename, key):
@@ -201,18 +205,20 @@ def searchBinaryFile(file, keyword):
     s= inFile(file, 'rb').read()
     return (s.find(keyword) >-1)
 
-def searchDomain(domainSet, keyword):
+def searchDomain( keyword):
+    domainSet = getPickleFile()
     MatchList = []
-    num = 0
     for file in domainSet:
-        # if (file != "C:/ProgramData\\Microsoft\\Diagnosis\\osver.txt"):
+        if (file_size(file) < float(0x19000)):  # maximum file size to read is 100 kilo bytes.
             resSearch = ""
             try:
-                if( searchFiles(file, keyword)):
+                if(searchFiles(file, keyword)):
                     MatchList.append(file)
             except:
                 #print('Failed to read this file ' + file)
                 continue
+    if (len(MatchList) == 0):
+        MatchList.append("SORRY...NO RESULTS ARE FOUND")
     return MatchList
 
 def searchTxtFile(file, keyword):
@@ -229,20 +235,24 @@ def searchTxtFile(file, keyword):
 
 def searchFiles(file, keyword):
     found = False
-    #formatFile="'"+file+"'"
-    #TEMPORARILY COMMENT
     formatFile = file.replace('\\','\\\\')
     #print(formatFile)
     if (file.lower().endswith('.ppt') or file.lower().endswith('.pptx')):
-        found = readPPT((file, keyword))
+        found = readPPTFiles(file, keyword)
+        return found
     elif (file.lower().endswith('.doc') or file.lower().endswith('.docx') ):
         found = readDocx(formatFile, keyword)
-    elif  (file.lower().endswith('txt')):
-        found = searchTxtFile(file, keyword)
+        return found
+    elif  (file.lower().endswith('.txt')):
+        found = searchTxtFile(formatFile, keyword)
+        return found
+    elif (file.lower().endswith('.xlsx') or file.lower().endswith('.xls')):
+        found = readEXCELFiles(formatFile, keyword)
+        return found
     else:
-        found = readEXCEL(file, keyword)
+        return found
 
-    return found
+
 
 
 def readDocx(file, keyword):
@@ -261,128 +271,126 @@ def readPDF(file):
     doc = textract.process(file)
     print(doc)
 
-def readPPT(file, keyword):
-    found = False
-    # with open (file) as f:
-    #     source_stream = StringIO(f.read())
-    #     if(source_stream.fin(keyword) >-1):
-    #         found = True
-    # source_stream.close()
-
-    prs = Presentation(file)
-    text_runs = []
-    for slide in prs.slides:
-        for shape in slide.shapes:
-            if not shape.has_textframe:
-                continue
-            for paragraph in shape.textframe.paragraphs:
-                for run in paragraph.runs:
-                    text_runs.append(run)
-    for i in text_runs:
-        print(i)
-
-    # os.system("tika --text file" > temp.text)
-    # with open (temp.text) as f:
-    #     text = f.read()
-    #     print(text)
-    #     if(test.fin(keyword) >-1):
-    #         found = True
-    # f.close()
-
-    return found
-
-
-def readEXCEL(file, keyword):
-    for sh in xlrd.open_workbook(file.sheets()):
-        for row in range(sh.nrows):
-            for col in range(sh.ncols):
-                myCell = sh.cell(row, col)
-                print(myCell)
-                if myCell.value == keyword:
-                    print('-----------')
-                    print('Found!')
-                    return True
-                    quit()
-    return False
+def readPPTFiles(file, keyword):
+        #print('Hello from the readPPTFiles')
+        formatFile = file.replace('\\', '\\\\')
+        prs = Presentation(formatFile)
+        #print(formatFile)
+        #print("----------------------")
+        for slide in prs.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, "text"):
+                    #print(shape.text)
+                    if(shape.text.find(keyword)> -1):
+                        print('----**//**//**/ FOUND')
+                        return True
+        return False
 
 def makePickleFile(searchDomain):
-    filename = 'C:\\Users\\alweheiby\\Documents\\CSUF\\CPSC_362\\Project\\finderData1'
+    filename = r'C:\Users\Public\DataDB'
     outFile = open(filename, "wb")
     pickle.dump(searchDomain, outFile)
     outFile.close()
 
+
 def getPickleFile():
-    filename = 'C:\\Users\\alweheiby\\Documents\\CSUF\\CPSC_362\\Project\\finderData1'
+    filename = r'C:\Users\Public\DataDB'
     inFile = open(filename,'rb')
     domainSet = pickle.load(inFile)
     #print(searchDomain)
     inFile.close()
     return domainSet
 #
-def finder_result(input_user):
-    creat()
-    # print(CandidateList)
 
-    domainSet = refineList()
-    # print('------Printing CandidatelIst')
-    # print(CandidateList)
-    # print(len(CandidateList))
-    # print('------Printing domainSet')
-    # makePickleFile(domainSet)
-    # for i in CandidateList:
-    #     print(i)
-    # print(len(CandidateList))
+def convert_bytes(num):
+    numFloat = float(num)
+    """
+    this function will convert bytes to MB.... GB... etc
+    """
+    # for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+    #     if num < 1024.0:
+            # return "%3.1f %s" % (num, x)
+    return numFloat
+        # num /= 1024.0
 
-    # time.sleep(10)
-    keyword = input_user
-    # domainSet = getPickleFile()
-    # # print(len(searchDomain))
-    # # for i in domainSet:
-    # #     print(i)
-    MatchList = searchDomain(domainSet, keyword)
-    # #/tchList=reSearch(searchDomain,keyword)
-    for i in MatchList:
-        print(i)
 
-    # file = 'C:/Users\alweheiby\Downloads\FinalProjects.docx'
-    # fileformat = file.replace('\\','\\\\')
-    # print(fileformat)
-    # found = readDocx('C:/Users\\alweheiby\\Downloads\\FinalProjects.docx', "glimpes")
-    # print(found)
-    t2 = datetime.now()
-    totalTime = t2 - t1
-    print(totalTime)
-    return MatchList
+def file_size(file_path):
+    """
+    this function will return the file size
+    """
+    if os.path.isfile(file_path):
+        file_info = os.stat(file_path)
+        return convert_bytes(file_info.st_size)
+
+
+# makePickleFile(domainSet)
+# for i in CandidateList:
+#     print(i)
+# print(len(CandidateList))
+
+# time.sleep(10)
+
+#domainSet = getPickleFile()
+# # print(len(searchDomain))
+
+# this file will be talking two parameters
+# 1. a file path for a excel file
+# 2. the key word that will be searched in that file
+# this class will return only true or false
+
+
+#test purpose
+#path = (r"C:\Users\17148\PycharmProjects\exceltester\testers\yeah.xls")
+#term = "abc"
+
+def readEXCELFiles(file, keyword):
+    # it can be poosbile that the passing path is not availabel for this function
+    # if that happens
+    # please try to convert the path using
+    # path = (r"the_path_of_the_file")
+    # and then call this function
+    # everything should be fine
+    if (file_size(file) < float(0xD0900)): #maximum file size to read is five mega bytes.
+
+        for sh in xlrd.open_workbook(file).sheets():
+
+                for row in range(sh.nrows):
+                    for col in range(sh.ncols):
+                        myCell = sh.cell(row, col)
+                        #print(myCell)
+                        if myCell.value == keyword:
+                            #print(myCell)
+                    # once the term is found
+                    # immediatly return true
+                    # and stop the loop
+                    # for better efficiency
+                            return True
+                            break
+
+
+    return False
+
+
+#domainSet = getPickleFile()
+# # print(len(searchDomain))
 # creat()
-# # print(CandidateList)
-#
+#keyword="The security of a system, application, or protocol is always relative"
+
 # domainSet = refineList()
-# # print('------Printing CandidatelIst')
-# # print(CandidateList)
-# # print(len(CandidateList))
-# # print('------Printing domainSet')
-# # makePickleFile(domainSet)
-# # for i in CandidateList:
-# #     print(i)
-# # print(len(CandidateList))
-#
-# # time.sleep(10)
-# keyword="Ahn"
-# #domainSet = getPickleFile()
-# # # print(len(searchDomain))
-# # # for i in domainSet:
-# # #     print(i)
-# MatchList = searchDomain(domainSet, keyword)
-# # #/tchList=reSearch(searchDomain,keyword)
-# for i in MatchList:
+# for i in domainSet:
+#     print(i, file_size(i))
+# makePickleFile(domainSet)
+# domainset = getPickleFile()
+# print(len(domainSet))
+# #
+# print("-----------########----------------")
+# keyword = "Ahmed"
+# domSet = getPickleFile()
+# MatchList = searchDomain( keyword)
+# for i in domSet:
 #     print(i)
 #
-#
-# # file = 'C:/Users\alweheiby\Downloads\FinalProjects.docx'
-# # fileformat = file.replace('\\','\\\\')
-# # print(fileformat)
-# # found = readDocx('C:/Users\\alweheiby\\Downloads\\FinalProjects.docx', "glimpes")
-# # print(found)
-# t2 = datetime.now()
-# totalTime = t2-t1
-# print(totalTime)
+
+t2 = datetime.now()
+totalTime = t2-t1
+print(totalTime)
