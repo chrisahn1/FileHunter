@@ -357,13 +357,8 @@ def readEXCELFiles(file, keyword):
                 for row in range(sh.nrows):
                     for col in range(sh.ncols):
                         myCell = sh.cell(row, col)
-                        #print(myCell)
+                      
                         if myCell.value == keyword:
-                            #print(myCell)
-                    # once the term is found
-                    # immediatly return true
-                    # and stop the loop
-                    # for better efficiency
                             return True
                             break
 
@@ -371,25 +366,6 @@ def readEXCELFiles(file, keyword):
     return False
 
 
-#domainSet = getPickleFile()
-# # print(len(searchDomain))
-# creat()
-#keyword="The security of a system, application, or protocol is always relative"
-
-# domainSet = refineList()
-# for i in domainSet:
-#     print(i, file_size(i))
-# makePickleFile(domainSet)
-# domainset = getPickleFile()
-# print(len(domainSet))
-# #
-# print("-----------########----------------")
-# keyword = "Ahmed"
-# domSet = getPickleFile()
-# MatchList = searchDomain( keyword)
-# for i in domSet:
-#     print(i)
-#
 
 t2 = datetime.now()
 totalTime = t2-t1
