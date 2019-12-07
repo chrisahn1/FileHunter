@@ -30,19 +30,20 @@ class Window(QWidget):
         self.cur_dir = ''
         self.cur_word = None
         self.search_button = QPushButton('Search')
-        self.ok_button = QPushButton('Ok')
+        self.exit_button = QPushButton('Exit')
 
         self.clicked_search = False
         self.search_button.clicked.connect(self.search_btn_clicked)
 
+
+        self.exit_button.clicked.connect(self.close)
 
         self.searchEdit = QLineEdit()
 
         self.listwidget = QListWidget()
 
         self.listwidget.setFixedSize(1100, 400)
-        self.listwidget.itemClicked.connect(self.btn_ok_result)
-
+        self.listwidget.itemDoubleClicked.connect(self.btn_ok_result)
 
 
 
@@ -51,7 +52,7 @@ class Window(QWidget):
         layout.addWidget(self.searchEdit, 1, 0)
         layout.addWidget(self.search_button, 1, 1)
         layout.addWidget(self.listwidget, 2, 0, 1, 6)
-        layout.addWidget(self.ok_button, 6, 1)
+        layout.addWidget(self.exit_button, 6, 1)
         #layout.addWidget(self.exit_button, 6, 2)
 
 
@@ -86,7 +87,11 @@ class Window(QWidget):
                 name = QListWidgetItem(icon, item)
                 self.listwidget.addItem(name)
                 self.cur_dir = ''
-        
+            else:
+                icon = QtGui.QIcon('pp.png')
+                name = QListWidgetItem(icon, item)
+                self.listwidget.addItem(name)
+                self.cur_dir = ''
 
 
 ### Highliter
@@ -102,6 +107,14 @@ class Window(QWidget):
             elif file.text()[-4:] == 'pptx':
                 file_opener.open_file(r'{}'.format(file.text()), self.cur_word)
                 return
+            elif file.text()[-4:] == '.txt':
+                file_opener.open_file(r'{}'.format(file.text()), self.cur_word)
+                return
+
+
+
+
+
 
 
 if __name__ == '__main__':
