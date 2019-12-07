@@ -12,6 +12,18 @@ import os
 
 
 def open_file(filename, target):
+    if '.txt' in filename:
+        file_Object = open(filename, 'r')
+        string_Holder = file_Object.readlines()
+        file_Object.close()
+        file_Object = open(filename, 'w')
+        for x in string_Holder:
+            if target in x:
+                y = x.replace(target, '*' + target + '*')
+                file_Object.write(y)
+            else:
+                file_Object.write(x)
+
     if '.docx' in filename:
        doc = Document(filename)
        for paragraph in doc.paragraphs:
@@ -32,7 +44,7 @@ def open_file(filename, target):
 
        doc.save(filename)
     if '.pptx' in filename:
-       prs = Presentation (filename)
+       prs = Presentation(filename)
        text_runs= []
        for slides in prs.slides:
            for shape in slides.shapes:
